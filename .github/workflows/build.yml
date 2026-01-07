@@ -1,26 +1,40 @@
 name: ShadowStream_Ultimate_Builder
-on: [push]
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
-    - uses: actions/checkout@v4
-    - name: Python Hazırla
+    - name: Kodu Çek
+      uses: actions/checkout@v4
+
+    - name: Python Kurulumu
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-    - name: Gereksinimleri Yükle
-      run: pip install pyinstaller requests
-    - name: YouTube Motorunu Çek (yt-dlp)
+
+    - name: Bağımlılıkları Yükle
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller requests
+
+    - name: YouTube Motorunu Hazırla (yt-dlp)
       run: |
         mkdir Tools
         curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe -o Tools/yt-dlp.exe
-    - name: EXE Oluştur (Her Şey Dahil)
+
+    - name: EXE Oluştur (Her Şey Dahil Portable)
       run: |
         pyinstaller --onefile --noconsole --add-data "Tools/yt-dlp.exe;Tools" shadow.py
-    - name: EXE Teslim Et
+
+    - name: ShadowStream EXE'yi Paketle ve Sun
       uses: actions/upload-artifact@v4
       with:
-        name: ShadowStream_Final_Pack
+        name: ShadowStream_Portable_EXE
         path: dist/shadow.exe
